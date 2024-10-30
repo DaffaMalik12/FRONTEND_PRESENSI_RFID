@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import {
-  Card,
   Input,
-  Checkbox,
   Button,
   Typography,
 } from "@material-tailwind/react";
 import { Link, useNavigate } from "react-router-dom";
+import Image from "../../../public/img/absensi.jpg"
 
-export function SignIn() {
+export function SignIn({ login }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -16,34 +15,42 @@ export function SignIn() {
 
   // Handler untuk login
   const handleLogin = (e) => {
-  e.preventDefault();
+    e.preventDefault();
+    console.log("handleLogin called"); // Tambahkan log ini
   
-  console.log("Email:", email); // Debugging
-  console.log("Password:", password); // Debugging
-  
-  fetch("http://localhost:3000/admin/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email: email,
-      password: password,
-    }),
-  })
+    fetch("http://localhost:3000/admin/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
+    })
     .then(response => response.json())
     .then(data => {
-      console.log("Login Berhasil: ", data);
-      navigate("/dashboard/home");
+      console.log(data); // Lihat respons yang diterima
+      if (data.success) {
+        console.log("Login successful, calling login() function");
+        login();
+        navigate("/dashboard/home", { replace: true }); 
+      } else {
+        setError(data.message || "Login gagal. Silakan coba lagi.");
+      }
     })
-    .catch(error => console.error("Error:", error));
-};
+    .catch(error => {
+      console.error("Error:", error);
+      setError("Terjadi kesalahan. Silakan coba lagi.");
+    });
+  };
   
+
   return (
     <section className="m-8 flex gap-4">
-    <div className="w-2/5 h-full hidden lg:block">
+      <div className="w-2/5 h-full mt-20 hidden lg:block">
         <img
-          src="/img/pattern.png"
+          src={Image}
           className="h-full w-full object-cover rounded-3xl"
         />
       </div>
@@ -82,24 +89,7 @@ export function SignIn() {
               }}
             />
           </div>
-          <Checkbox
-            label={
-              <Typography
-                variant="small"
-                color="gray"
-                className="flex items-center justify-start font-medium"
-              >
-                I agree the&nbsp;
-                <a
-                  href="#"
-                  className="font-normal text-black transition-colors hover:text-gray-900 underline"
-                >
-                  Terms and Conditions
-                </a>
-              </Typography>
-            }
-            containerProps={{ className: "-ml-2.5" }}
-          />
+          
           <Button type="submit" className="mt-6" fullWidth>
             Sign In
           </Button>
@@ -110,28 +100,9 @@ export function SignIn() {
             </Typography>
           )}
 
-          <div className="flex items-center justify-between gap-2 mt-6">
-            <Checkbox
-              label={
-                <Typography
-                  variant="small"
-                  color="gray"
-                  className="flex items-center justify-start font-medium"
-                >
-                  Subscribe me to newsletter
-                </Typography>
-              }
-              containerProps={{ className: "-ml-2.5" }}
-            />
-            <Typography variant="small" className="font-medium text-gray-900">
-              <a href="#">
-                Forgot Password
-              </a>
-            </Typography>
-          </div>
           <Typography variant="paragraph" className="text-center text-blue-gray-500 font-medium mt-4">
             Not registered?
-            <Link to="/auth/sign-up" className="text-gray-900 ml-1">Create account</Link>
+            <Link to="/auth/sign-up" className="text-gray-900 ml-1">Create an account</Link>
           </Typography>
         </form>
       </div>

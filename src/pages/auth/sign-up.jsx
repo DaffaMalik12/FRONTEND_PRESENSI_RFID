@@ -7,20 +7,24 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2"; // Import SweetAlert2
+import Image from "../../../public/img/absensi.jpg"
 
 export function SignUp() {
-  const [username, setUsername] = useState(""); // Add this line for username state
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [agree, setAgree] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
     if (!agree) {
-      setError("You must agree to the Terms and Conditions.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'You must agree to the Terms and Conditions.',
+      });
       return;
     }
 
@@ -30,30 +34,44 @@ export function SignUp() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, username }), // Include username in the request
+        body: JSON.stringify({ email, password, username }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.message || "Registration failed");
+        Swal.fire({
+          icon: 'error',
+          title: 'Registration Failed',
+          text: errorData.message || 'Registration failed',
+        });
       } else {
         const data = await response.json();
-        setSuccess(data.message || "Registration successful!");
-        setUsername(""); // Clear the username field
-        setEmail(""); // Clear the email field
-        setPassword(""); // Clear the password field
-        setAgree(false); // Reset the agree checkbox
+        Swal.fire({
+          icon: 'success',
+          title: 'Registration Successful!',
+          text: data.message || 'You have registered successfully!',
+        });
+
+        // Reset form fields
+        setUsername("");
+        setEmail("");
+        setPassword("");
+        setAgree(false);
       }
     } catch (error) {
-      setError("An error occurred. Please try again.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'An error occurred. Please try again.',
+      });
     }
   };
 
   return (
-    <section className="m-8 flex">
-      <div className="w-2/5 h-full hidden lg:block">
+    <section className="m-20 flex">
+      <div className="w-2/5 h-full  hidden lg:block">
         <img
-          src="/img/pattern.png"
+          src={Image}
           className="h-full w-full object-cover rounded-3xl"
         />
       </div>
@@ -63,7 +81,7 @@ export function SignUp() {
             Join Us Today
           </Typography>
           <Typography variant="paragraph" color="blue-gray" className="text-lg font-normal">
-            Welcome  to our community! Please fill out the form below to register.
+            Welcome to our community! Please fill out the form below to register.
           </Typography>
         </div>
         <form className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2" onSubmit={handleRegister}>
@@ -78,8 +96,8 @@ export function SignUp() {
               labelProps={{
                 className: "before:content-none after:content-none",
               }}
-              value={username} // Bind username state here
-              onChange={(e) => setUsername(e.target.value)} // Update username state on change
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>
@@ -140,8 +158,6 @@ export function SignUp() {
             Register Now
           </Button>
 
-          {error && <Typography color="red" className="mt-4 text-center">{error}</Typography>}
-          {success && <Typography color="green" className="mt-4 text-center">{success}</Typography>}
           <Typography variant="paragraph" className="mt-4 flex justify-center gap-1">
             Already have an account?
             <Link to="/auth/sign-in" className="font-medium text-black transition-colors hover:text-gray-900">
