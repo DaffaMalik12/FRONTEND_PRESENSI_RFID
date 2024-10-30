@@ -49,6 +49,6 @@ A frontend application for managing user profiles and registration for a presenc
    ```bash
    npm install @mui/material @emotion/react @emotion/styled
 
-4. Install Material UI:
+4. Install SweetAlert2:
    ```bash
    npm install sweetalert2
